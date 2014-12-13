@@ -22,10 +22,14 @@ object Solution{
 }
 class Solution {
 
-  def isFibo(i: Int) = fibosUntil(i).last == i
+  def isFibo(i: Int) = {
+      val fibos = fibosUntil(i)
+      if (fibos.isEmpty) false else fibos.last == i
+  }
 
   def fibosUntil(i: Int) = {
     i match {
+      case n if n < 0 => Seq()
       case 0 => Seq(0)
       case n => generateFibosUntil(i, Seq(0,1))
     }

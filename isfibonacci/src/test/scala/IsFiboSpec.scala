@@ -39,6 +39,15 @@ class IsFiboSpec extends Specification {
     }
   }
 
+  "fibosUntil(-1)" should {
+    val isFibo = new Solution()
+    val fibs = isFibo.fibosUntil(-1)
+
+    "return an empty seq" in {
+        fibs must equalTo(Seq())
+    }
+   }
+
   "Given IsFibo, it" should {
     val isFibo = new Solution()
     "return true for 5" in {
@@ -47,6 +56,10 @@ class IsFiboSpec extends Specification {
     "return false for 6" in {
       isFibo.isFibo(6) must beFalse
     }
+
+    "return false for -1" in {
+        isFibo.isFibo(-1) must beFalse
+     }
   }
 }
 
