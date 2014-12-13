@@ -50,15 +50,15 @@ class IsFiboSpec extends Specification {
 
   "Given IsFibo, it" should {
     val isFibo = new Solution()
-    "return true for 5" in {
-      isFibo.isFibo(5) must beTrue
+    "return IsFibo for 5" in {
+      isFibo.isFibo(5) must equalTo("IsFibo")
     }
-    "return false for 6" in {
-      isFibo.isFibo(6) must beFalse
+    "return IsNotFibo for 6" in {
+      isFibo.isFibo(6) must equalTo("IsNotFibo") 
     }
 
-    "return false for -1" in {
-        isFibo.isFibo(-1) must beFalse
+    "return IsNotFibo for -1" in {
+        isFibo.isFibo(-1) must equalTo("IsNotFibo")
      }
   }
 }
