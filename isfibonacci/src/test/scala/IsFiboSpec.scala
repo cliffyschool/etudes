@@ -6,7 +6,7 @@ import org.specs2.mutable._
 class IsFiboSpec extends Specification {
 
   "fibosUntil(5)" should {
-    val isFib = new IsFibo()
+    val isFib = new Solution()
     val fibs = isFib.fibosUntil(5)
     "return 0,1,1,2,3,5" in {
       fibs must equalTo(Seq(0,1,1,2,3,5))
@@ -14,7 +14,7 @@ class IsFiboSpec extends Specification {
   }
 
   "fibosUntil(10)" should {
-    val isFib = new IsFibo()
+    val isFib = new Solution()
     val fibs = isFib.fibosUntil(10)
     "return 0,1,1,2,3,5,8,13" in {
       fibs must equalTo(Seq(0, 1, 1, 2, 3, 5, 8, 13))
@@ -22,7 +22,7 @@ class IsFiboSpec extends Specification {
   }
 
   "fibosUntil(0)" should {
-    val isFibo = new IsFibo()
+    val isFibo = new Solution()
     val fibs = isFibo.fibosUntil(0)
 
     "return 0" in {
@@ -31,11 +31,21 @@ class IsFiboSpec extends Specification {
   }
 
   "fibosUntil(1)" should {
-    val isFibo = new IsFibo()
+    val isFibo = new Solution()
     val fibs = isFibo.fibosUntil(1)
 
     "return 0,1" in {
       fibs must equalTo(Seq(0, 1))
+    }
+  }
+
+  "Given IsFibo, it" should {
+    val isFibo = new Solution()
+    "return true for 5" in {
+      isFibo.isFibo(5) must beTrue
+    }
+    "return false for 6" in {
+      isFibo.isFibo(6) must beFalse
     }
   }
 }

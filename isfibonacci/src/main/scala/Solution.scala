@@ -1,10 +1,29 @@
+import java.util.Scanner
+
 import scala.annotation.tailrec
 import scala.collection.Seq
+import scala.collection.mutable
 
 /**
  * Created by cfreeman on 12/12/14.
  */
-class IsFibo {
+object Solution{
+
+  def main(args: Array[String]) : Unit = {
+    val in = new Scanner(System.in)
+    val fibo = new Solution()
+    val numLines = in.nextLine().toInt
+    val nums = (1 to numLines).map(i => in.nextLine().toInt)
+    nums.map(i => fibo.isFibo(i)).map {
+      case false => "IsNotFibo"
+      case true => "IsFibo"
+    }.map(println)
+  }
+}
+class Solution {
+
+  def isFibo(i: Int) = fibosUntil(i).last == i
+
   def fibosUntil(i: Int) = {
     i match {
       case 0 => Seq(0)
@@ -19,5 +38,4 @@ class IsFibo {
       case n => generateFibosUntil(maxFibo, fibos ++ Seq(fibos.takeRight(2).sum))
     }
   }
-
 }
