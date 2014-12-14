@@ -12,7 +12,6 @@ object Solution{
     val numLines = getNumLines(in) 
     val lines = readLines(in, numLines) 
     lines.map(l => solution.phoneNumber(l)).map(println)
-    // TODO: call solution
   }
 
   def getNumLines(in: Scanner) = {
@@ -27,7 +26,7 @@ class Solution {
     def phoneNumber(s: String) = {
         val regex = """(\d{1,3})[\- ](\d{1,3})[\- ](\d{4,10})""".r
         val m = regex.findAllMatchIn(s).next()
-        s"CountryCode=${m.group(1)}LocalAreaCode=${m.group(2)}Number=${m.group(3)}"
+        s"CountryCode=${m.group(1)},LocalAreaCode=${m.group(2)},Number=${m.group(3)}"
     }
 }
 
