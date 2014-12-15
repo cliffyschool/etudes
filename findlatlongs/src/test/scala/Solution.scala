@@ -24,13 +24,14 @@ object Solution{
 }
 class Solution {
     def latLong(s: String) = {
-        val regex = """\(([\-\+]?[0-9\.]+)\,\s+([\-\+]?[0-9\.]+)\)""".r
+        val regex = """\(([\-\+]?[1-9]{1}[0-9]{0,}(\.[0-9]+)?)\,\s+([\-\+]?[1-9]{1}[0-9]{0,}(\.[0-9]+)?)\)""".r
         regex.findAllMatchIn(s)
         match {
-          case matches if !matches.hasNext => false
+          case matches if !matches.hasNext => "Invalid"
           case matches =>
             val m = matches.next 
-            (m.group(1), m.group(2))
+            println(m.group(1) + " " + m.group(3))
+            (m.group(1), m.group(3))
             match {
               case ll if validLatLong(ll._1.toFloat,ll._2.toFloat) => "Valid"
               case _ => "Invalid"
@@ -68,6 +69,16 @@ class SolutionSpec extends Specification {
 
         "disallow out-of-range longs" in {
             val result = s.latLong("(30, -190)")
+            result must equalTo("Invalid")
+        }
+
+        "disallow leading zeroes" in {
+            val result = s.latLong("(-09.00000, -170.0000)")
+            result must equalTo("Invalid")
+        }
+
+        "disallow trailing decimal point" in {
+            val result = s.latLong("(9., 170)")
             result must equalTo("Invalid")
         }
     }
