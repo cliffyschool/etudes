@@ -30,7 +30,6 @@ class Solution {
           case matches if !matches.hasNext => "Invalid"
           case matches =>
             val m = matches.next 
-            println(m.group(1) + " " + m.group(3))
             (m.group(1), m.group(3))
             match {
               case ll if validLatLong(ll._1.toFloat,ll._2.toFloat) => "Valid"
