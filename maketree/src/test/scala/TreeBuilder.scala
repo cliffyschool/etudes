@@ -16,7 +16,7 @@ class TreeBuilder {
 
       while (!nodesById.isEmpty){
         val nodesToMove =
-        nodesByIdex
+        nodesById
           .flatMap{entry =>
             parentIdsToChildIds.get(entry._1) match {
               case Some(ids) => Some((entry._1, ids))
