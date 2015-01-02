@@ -43,7 +43,7 @@ class TreeBuilder {
 case class Node(id: Int, parentId: Option[Int])
 case class TreeNode(id: Int, children: mutable.Set[TreeNode])
 
-class SolutionSpec extends Specification {
+class TreeBuilderSpec extends Specification {
     "Given a parent and child, the tree" should {
         val s = new TreeBuilder()
         val nodes = List(Node(1, None), Node(2, Some(1)))
