@@ -4,6 +4,10 @@ import scala.collection.mutable.ListBuffer
 import scala.collection.{mutable, Seq}
 import org.specs2.mutable._
 
+/**
+ * Converts a flat list of childId/parentId nodes to a TreeNode structure, with
+ * a children property.
+ */
 class TreeBuilder {
     def buildTree(nodes: List[Node]) : Seq[TreeNode] = {
       val nodesById = mutable.Map(nodes.map(n => (n.id, n)).toMap.toSeq: _*)

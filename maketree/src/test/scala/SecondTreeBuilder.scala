@@ -4,15 +4,18 @@ import scala.annotation.tailrec
 import scala.collection.{mutable, Seq}
 
 /**
- * This implementation gets rid of the while loop and is recursive.
+ * Converts a flat list of childId/parentId nodes to a TreeNode structure, with
+ * a children property.
  */
 class SecondTreeBuilder {
   def buildTree(nodes: List[Node]) : Seq[TreeNode] = {
+
     val nodesById = nodes.map(n => (n.id, n)).toMap
     val parentIdsToChildIds = nodes.filter(n => n.parentId.isDefined)
     .foldLeft(new mutable.HashMap[Int,mutable.Set[Int]] with mutable.MultiMap[Int,Int])((mapSoFar, node) =>
       mapSoFar.addBinding(node.parentId.get, node.id))
 
+    // find leaf nodes and move them from nodesById to initialTree
     val leaves = nodesById.filterNot(entry => parentIdsToChildIds.contains(entry._1)).map(_._2)
     val initialTree = addNodes(Map.empty[Int,TreeNode], leaves.map(n => TreeNode(n.id, mutable.Set())))
     val nodeMapWithoutLeaves = removeNodes(nodesById, leaves.map(_.id))
@@ -30,7 +33,6 @@ class SecondTreeBuilder {
   private def removeNodes(nodeMap: Map[Int,Node], nodeIds: Iterable[Int]) =
     nodeIds.foldLeft(nodeMap)((mapSoFar, nodeId) => mapSoFar - nodeId)
 
-
   @tailrec
   private def makeTree(nodesById: Map[Int,Node], parentIdsToChildrenIds: mutable.MultiMap[Int,Int],
                         tree: Map[Int,TreeNode])
@@ -42,11 +44,13 @@ class SecondTreeBuilder {
     val nodesToMove =
       nodesById
         .flatMap{entry =>
+        // get child ids
         parentIdsToChildrenIds.get(entry._1) match {
           case Some(ids) => Some((entry._1, ids))
           case None => None
         }
       }.toSeq
+        // find parent/child tuples where the children are all already in the tree
         .filter(e => e._2.subsetOf(tree.keys.toSet))
         .map(e => TreeNode(e._1, e._2.map(id => tree(id))))
 
