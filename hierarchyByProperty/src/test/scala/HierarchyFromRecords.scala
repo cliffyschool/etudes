@@ -7,7 +7,7 @@ class HierarchyFromRecords[T] {
     def buildHierarchy(   records: Seq[T],
                           groupByFunctions: List[(T => String)]) = {
 
-      val root = recurseBuild("", records.toList, groupByFunctions, 0)
+      val root = recurseBuild(FlatNode("", records.toList), groupByFunctions, 0)
       root.children
     }
 
@@ -21,22 +21,21 @@ class HierarchyFromRecords[T] {
       node.children.foreach(n => recursePrint(n, level+1))
     }
 
-    def recurseBuild( id: String,
-                      records: List[T],
+    def recurseBuild( flatNode: FlatNode[T],
                       getValFunctions: List[(T) => String],
                       functionIndex: Int ) : Node[T] = {
       if (getValFunctions.size <= functionIndex)
-        return Node(id, records, List())
+        return Node(flatNode.id, flatNode.records, List())
 
-      val childNodes = records.groupBy(getValFunctions(functionIndex))
-                          .map(m => Node(m._1, m._2.toList, List()))
+      val flatChildNodes = flatNode.records.groupBy(getValFunctions(functionIndex))
+                          .map(m => FlatNode(m._1, m._2.toList))
 
-      val rChildNodes = childNodes.map(c => recurseBuild(c.id, c.records, getValFunctions, functionIndex+1)).toList
-      Node(id, records, rChildNodes)
+      val childNodes = flatChildNodes.map(f => recurseBuild(f, getValFunctions, functionIndex+1)).toList
+      Node(flatNode.id, flatNode.records, childNodes)
     }
 }
 
-case class FlatNode[T]
+case class FlatNode[T](id: String, records: List[T])
 case class Node[T](id: String, records: List[T], children: List[Node[T]])
 
 class HierarchyFromPropertiesSpec extends Specification {
