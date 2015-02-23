@@ -18,7 +18,7 @@ class HierarchyFromRecords[T] {
                      groupByFunctions: List[(T => String)]) = {
 
     val flatNodes = records.map(r => generateFlatNodes(r, groupByFunctions)).flatten
-    .groupBy(f => f.id).map(a => a._2(0)).toList
+    .groupBy(f => f.id).map(a => a._2.head).toList
 
     val allParentIds = flatNodes.map(node => node.path).flatten
     val leaves = flatNodes.filter(node => !allParentIds.contains(node.id))
