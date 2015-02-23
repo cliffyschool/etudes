@@ -22,24 +22,27 @@ class HierarchyFromRecords[T] {
 
     val allParentIds = flatNodes.map(node => node.path).flatten
     val leaves = flatNodes.filter(node => !allParentIds.contains(node.id))
+    .map(l => Node[T](l.id, List(), l.path))
 
-    var processed = leaves.map(l => Node[T](l.id, List(), l.path))
-    var toProcess = flatNodes.filterNot(f => processed.exists(p => p.id == f.id ))
-    var toRemove = List[FlatNode[T]]()
-    while (!toProcess.isEmpty){
-      toProcess = toProcess.filterNot(p => toRemove.exists(r => r.id == p.id))
-      toRemove = List()
-      toProcess.foreach(parent => {
-        if (!toProcess.exists(test => test.path.contains(parent.id))){
-          val processedChildren = processed.filter(c => !c.path.isEmpty && c.path.last == parent.id).toList
-          val parentNode = Node[T](parent.id, processedChildren, parent.path)
-          processed = processed :+ parentNode
-          toRemove = toRemove :+ parent
-        }
-      })
-    }
+    val toProcess = flatNodes.filterNot(f => leaves.exists(l => l.id == f.id ))
+    val processed = process(toProcess,leaves)
 
     processed.filter(p => p.path.isEmpty).toList
+  }
+
+  def process(toProcess: List[FlatNode[T]], processed:List[Node[T]]) : List[Node[T]] = {
+    if (toProcess.isEmpty)
+      return processed
+
+    val parent = toProcess.head
+    if (!toProcess.map(_.path).flatten.contains(parent.id)){
+      val children = processed.filter(c => c.path.lastOption == Some(parent.id)).toList
+      val parentAsNode = Node[T](parent.id, children, parent.path)
+      process(toProcess.tail, processed :+ parentAsNode)
+    }
+    else {
+      process(toProcess.tail :+ toProcess.head, processed)
+    }
   }
 
   def generateFlatNodes(record: T, groupByFunctions: List[(T => String)]) = {
