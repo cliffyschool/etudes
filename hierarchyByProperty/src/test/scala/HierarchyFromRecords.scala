@@ -18,11 +18,11 @@ class HierarchyFromRecords[T] {
                      groupByFunctions: List[(T => String)]) = {
 
     val flatNodes = records.map(r => generateFlatNodes(r, groupByFunctions)).flatten
-    .groupBy(f => f.id).map(a => a._2.head).toList
+                    .groupBy(f => f.id).map(a => a._2.head).toList
 
     val allParentIds = flatNodes.map(node => node.path).flatten
     val leaves = flatNodes.filter(node => !allParentIds.contains(node.id))
-    .map(l => Node[T](l.id, List(), l.path))
+                  .map(l => Node[T](l.id, List(), l.path))
 
     val toProcess = flatNodes.filterNot(f => leaves.exists(l => l.id == f.id ))
     val processed = process(toProcess,leaves)
