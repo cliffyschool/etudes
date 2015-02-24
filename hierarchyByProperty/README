@@ -1,1 +1,1 @@
-Template for HackerRank submissions in Scala.
+A class for doing applying "group by" to a set of flat records to convert it into a hierarchy.
