@@ -25,17 +25,17 @@ object Solution{
   }
 }
 class Solution {
-    // TODO
-    def calculateLargestDecentNumber(digits: Int) = {
-      val multiplesOf3 = (0 to (digits / 3).floor.toInt).map(d => d*3)
-      val operandPairs = multiplesOf3.map(three => (three,digits-three))
-      val matchingPairs = operandPairs.filter(p => p._2 % 5 == 0)
+    def calculateLargestDecentNumber(n: Int) = {
+      val multiplesOf3 = (0 to (n / 3).floor.toInt).map(d => d*3)
+      val pairsWhoseSumIsN = multiplesOf3.map(three => (three,n-three))
+      val mod3Mod5Pairs = pairsWhoseSumIsN
+        .filter(p => p._2 % 5 == 0)
         .filterNot(p => p._1 == 0 && p._2 == 0)
         .sortBy(_._2)
      
-      val digitList = matchingPairs
+      mod3Mod5Pairs
         .headOption
         .map(p => (List.fill(p._1)('5') ++ List.fill(p._2)('3')).mkString)
-      digitList.getOrElse("-1")
+        .getOrElse("-1")
     }
 }

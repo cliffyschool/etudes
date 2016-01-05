@@ -11,6 +11,7 @@ class SolutionSpec extends Specification {
         val n = new java.util.Random().nextInt(12345)
         val result = s.calculateLargestDecentNumber(n)
         println(result)
+
         "be N digits long" in {
             result.length must equalTo(n)
          }
@@ -26,6 +27,14 @@ class SolutionSpec extends Specification {
     }
 
     "Given a 0, the decent number" should {
+      val s = new Solution()
+      val result = s.calculateLargestDecentNumber(0)
+      "be -1" in {
+        result must equalTo("-1")
+      }
+    }
+
+    "Given an int N with no decent number, the result" should {
       val s = new Solution()
       val result = s.calculateLargestDecentNumber(0)
       "be -1" in {
