@@ -23,10 +23,45 @@ object Solution{
     (1 to numLines).map(i => in.nextLine())
   }
 }
+
+case class Cell(row: Int, col: Int, num: Int)
+
 class Solution {
     def rotateMatrix(matrix: Array[Array[Int]]) = {
+      val rowCount = matrix.length;
+      val colCount = matrix(0).length
+      val levelCount = Math.min(rowCount, colCount) / 2
+      println(levelCount)
+      val cells =
+      (0 to rowCount - 1)
+        .map(row => (0 to colCount - 1)
+        .map(col => Cell(row,col, matrix(row)(col))))
+        .flatten
+        //.filter(cell => cell.row == 0 || cell.row == rowCount - 1 || cell.col == 0 || cell.col == colCount -1)
+      val rotated = cells
+        .map(cell => nextPos(cell, cells.head, cells.last))
 
-      matrix
+        println(rotated.sortBy(c => (c.row,c.col)))
+      rotated
+    }
+
+    def nextPos(cell: Cell, topLeft: Cell, bottomRight: Cell) = {
+     cell match {
+       case topLeft => Cell(topLeft.row + 1, topLeft.col, topLeft.num)
+       case bottomRight => Cell(bottomRight.row -1, bottomRight.col, bottomRight.num)
+       //topRight
+       case c @ Cell(topLeft.row, bottomRight.col, _) => Cell(topLeft.row, bottomRight.col - 1, c.num)
+       // bottomLeft
+       case c @ Cell(bottomRight.row, topLeft.col, _) => Cell(bottomRight.row, topLeft.col + 1, c.num)
+       // top
+       case c @ Cell(topLeft.row,_, _) => Cell(c.row, c.col - 1, c.num)
+       // left
+       case c @ Cell(_, topLeft.col, _) => Cell(c.row + 1, c.col, c.num)
+       // bottom
+       case c @ Cell(bottomRight.row, _, _) => Cell(c.row, c.col + 1, c.num)
+       // right
+       case c @ Cell(_, bottomRight.col, _) => Cell(c.row - 1, c.col, c.num)
+     }
     }
 }
 
@@ -46,8 +81,8 @@ class SolutionSpec extends Specification {
         expected(2) = Array(16,8,21,13)
         expected(3) = Array(10,14,20,7)
         expected(4) = Array(4,3,2,1)
+        
         val result = s.rotateMatrix(matrix)
-        println(result)
 
         "rotate it" in {
             result(0) must equalTo(expected(0))
