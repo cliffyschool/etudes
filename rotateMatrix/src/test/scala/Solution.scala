@@ -28,21 +28,34 @@ case class Cell(row: Int, col: Int, num: Int)
 
 class Solution {
     def rotateMatrix(matrix: Array[Array[Int]]) = {
-      val rowCount = matrix.length;
-      val colCount = matrix(0).length
-      val levelCount = Math.min(rowCount, colCount) / 2
-      println(levelCount)
-      val cells =
-      (0 to rowCount - 1)
-        .map(row => (0 to colCount - 1)
-        .map(col => Cell(row,col, matrix(row)(col))))
-        .flatten
-        .filter(cell => cell.row == 0 || cell.row == rowCount - 1 || cell.col == 0 || cell.col == colCount -1)
-      val rotated = cells
-        .map(cell => nextPos(cell, cells.head, cells.last))
-        .sortBy(c => (c.row,c.col))
+      val maxRow = matrix.length - 1
+      val maxCol = matrix(0).length - 1
+      val levelCount = Math.min(matrix.length, matrix(0).length) / 2
+      val rotated = (0 to levelCount - 1)
+        .map(l => (Cell(l,l,matrix(l)(l)),
+                    Cell(maxRow-l, maxCol-l,matrix(maxRow-l)(maxCol-l))))
+      .map(cornerTuple => (cornerTuple._1, cornerTuple._2, cellsInLevel(cornerTuple._1, cornerTuple._2, matrix)))
+      .flatMap(levelCells => levelCells._3.map(c => rotateCell(c, levelCells._1, levelCells._2, 1)))
 
       rotated
+    }
+
+    def cellsInLevel(topLeft: Cell, bottomRight: Cell, matrix:Array[Array[Int]]) = {
+      val cells =
+      // topLeft -> bottomLeft
+      (topLeft.row to bottomRight.row).map(row => Cell(row, topLeft.col, matrix(row)(topLeft.col))) ++
+      // bottomLeft -> bottomRight
+      (topLeft.col + 1 to bottomRight.col).map(col => Cell(bottomRight.row, col, matrix(bottomRight.row)(col))) ++
+      // bottomRight -> topRight
+      (bottomRight.row - 1 to topLeft.row by -1).map(row => Cell(row, bottomRight.col, matrix(row)(bottomRight.col))) ++
+      // topRight -> topLeft
+      (bottomRight.col -1 to topLeft.col + 1 by -1).map(col => Cell(topLeft.row, col, matrix(topLeft.row)(col)))
+      cells
+    }
+
+    def rotateCell(cell: Cell, topLeft:Cell, bottomRight: Cell, times: Int) = {
+      (0 until times)
+        .foldLeft(cell)( (cell,index) => nextPos(cell,topLeft,bottomRight))
     }
 
     def nextPos(cell: Cell, topLeft: Cell, bottomRight: Cell) = {
@@ -74,6 +87,7 @@ class Solution {
 }
 
 class SolutionSpec extends Specification {
+
     "Given topLeft, nextPos" should {
       val sol = new Solution();
       val topLeft = Cell(0,0,1)
@@ -94,10 +108,11 @@ class SolutionSpec extends Specification {
       val rotated = sol.rotateMatrix(matrix)
       println(rotated)
       "rotate it" in {
-        rotated(0) must equalTo(Cell(0,0,2))
-        rotated(1) must equalTo(Cell(0,1,4))
-        rotated(2) must equalTo(Cell(1,0,1))
-        rotated(3) must equalTo(Cell(1,1,3))
+        rotated must contain(
+          Cell(0,0,2),
+          Cell(0,1,4),
+          Cell(1,0,1),
+          Cell(1,1,3))
       }
     }
     
