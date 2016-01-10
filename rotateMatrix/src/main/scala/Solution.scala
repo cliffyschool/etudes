@@ -15,7 +15,7 @@ object Solution{
     val matrix = matrixStrings.map(s => s.split(' ').map(_.toInt).toArray).toArray
     val sol = new Solution()
     val rotated = sol.rotateMatrix(matrix, rowsColsRotations(2))
-    rotated.groupBy(_.row).toSeq.sortBy(_._1).map(_._2.map(_.num)).map(println)
+    rotated.groupBy(_.row).toSeq.sortBy(_._1).map(_._2.map(_.num)).map(v => {v.map(n => print(s"$n ")); println})
   }
 
   def getNumLines(in: Scanner) = {
