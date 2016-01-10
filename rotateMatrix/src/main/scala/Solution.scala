@@ -2,7 +2,6 @@ import java.util.Scanner
 import scala.annotation.tailrec
 import scala.collection.Seq
 import scala.collection.mutable
-import org.specs2.mutable._
 
 object Solution{
 
