@@ -1,5 +1,4 @@
 import java.util.Scanner
-import scala.annotation.tailrec
 import scala.collection.Seq
 import scala.collection.mutable
 
@@ -10,9 +9,9 @@ object Solution{
     val solution = new Solution()
     val configLine = readLines(in, 1)(0)
 
-    val rowsColsRotations = configLine.split(' ').map(_.toInt).toList
+    val rowsColsRotations = getInts(configLine).toList
     val matrixStrings = readLines(in, rowsColsRotations(0))
-    val matrix = matrixStrings.map(s => s.split(' ').map(_.toInt).toArray).toArray
+    val matrix = matrixStrings.map(s => getInts(s).toArray).toArray
     val sol = new Solution()
     val rotated = sol.rotateMatrix(matrix, rowsColsRotations(2))
     rotated.groupBy(_.row).toSeq.sortBy(_._1).map(_._2.map(_.num)).map(v => {v.map(n => print(s"$n ")); println})
@@ -24,6 +23,10 @@ object Solution{
 
   def readLines(in: Scanner, numLines: Int) = {
     (1 to numLines).map(i => in.nextLine())
+  }
+
+  def getInts(line: String ) = {
+    line.split(" ").map(_.toInt)
   }
 }
 
@@ -57,29 +60,23 @@ class Solution {
     }
 
     def nextPos(cell: Cell, topLeft: Cell, bottomRight: Cell) = {
-     cell match {
-       case c @ Cell(topLeft.row, topLeft.col, _) =>
-         Cell(topLeft.row + 1, topLeft.col, c.num)
-       case c @ Cell(bottomRight.row, bottomRight.col,_) =>
-         Cell(bottomRight.row -1, bottomRight.col, c.num)
+      val (row, col) = 
+      (cell.row, cell.col) match {
+       case (topLeft.row, topLeft.col) => (topLeft.row + 1, topLeft.col)
+       case (bottomRight.row, bottomRight.col) => (bottomRight.row -1, bottomRight.col)
        //topRight
-       case c @ Cell(topLeft.row, bottomRight.col, _) =>
-         Cell(topLeft.row, bottomRight.col - 1, c.num)
+       case (topLeft.row, bottomRight.col) => (topLeft.row, bottomRight.col - 1)
        // bottomLeft
-       case c @ Cell(bottomRight.row, topLeft.col, _) =>
-         Cell(bottomRight.row, topLeft.col + 1, c.num)
+       case (bottomRight.row, topLeft.col) => (bottomRight.row, topLeft.col + 1)
        // top
-       case c @ Cell(topLeft.row,_, _) =>
-         Cell(c.row, c.col - 1, c.num)
+       case (topLeft.row, col: Int) => (topLeft.row, col - 1)
        // left
-       case c @ Cell(_, topLeft.col, _) =>
-         Cell(c.row + 1, c.col, c.num)
+       case (row: Int, topLeft.col) => (row + 1, topLeft.col)
        // bottom
-       case c @ Cell(bottomRight.row, _, _) =>
-         Cell(c.row, c.col + 1, c.num)
+       case (bottomRight.row, col: Int) => (bottomRight.row, col + 1)
        // right
-       case c @ Cell(_, bottomRight.col, _) =>
-         Cell(c.row - 1, c.col, c.num)
+       case (row: Int, bottomRight.col) => (row - 1, bottomRight.col)
      }
+    Cell(row, col, cell.num)
     }
 }
