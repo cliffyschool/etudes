@@ -12,12 +12,16 @@ class Solution {
     else
     {
       val mostCommonCount = distinctCounts.max
-      val outlierCountOccurences = distinctChars.values
+      val lessCommonCount = distinctCounts.filter(c => c != mostCommonCount).head
+      val countOccurrences = distinctChars.values
         .groupBy(cnt => cnt)
         .map(e => (e._1, e._2.size))
-        .filter(e => e._1 != mostCommonCount).values
-        .headOption
-      outlierCountOccurences.isEmpty || outlierCountOccurences.get == 1
+        .toMap
+      val couldRemoveMostCommon = mostCommonCount - 1 == lessCommonCount &&
+        countOccurrences(mostCommonCount) == 1
+      val couldRemoveLeastCommon = lessCommonCount == 1 &&
+        countOccurrences(lessCommonCount) == 1
+      couldRemoveMostCommon || couldRemoveLeastCommon
     }
   }
 }

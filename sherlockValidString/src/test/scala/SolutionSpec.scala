@@ -26,4 +26,19 @@ class SolutionSpec extends Specification {
       result must equalTo(false)
     }
   }
+  "Given test string" should {
+    str = "hfchdkkbfifgbgebfaahijchgeeeiagkadjfcbekbdaifchkjfejckbiiihegacfbchdihkgbkbddgaefhkdgccjejjaajgijdkd"
+    val result = s.isValidInOneOrFewerRemoves(str)
+    "return true" in {
+      result must equalTo(true)
+    }
+  }
+  "Given other test string" should {
+    str = "aabbccddeefghi"
+    val result = s.isValidInOneOrFewerRemoves(str)
+    "return false" in {
+      result must equalTo(false)
+    }
+  }
+
 }
