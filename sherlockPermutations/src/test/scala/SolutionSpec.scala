@@ -36,19 +36,19 @@ class SolutionSpec extends Specification {
     "Given a large number of 0's" should {
         val result = s.permutationsStartingWithOne(900, 4)
         "return something" in {
-            result must beGreaterThan(1L)
+            result must beGreaterThan(BigInt(1))
         }
     }
     "Given a large number of 1's" should {
         val result = s.permutationsStartingWithOne(4, 900)
         "return something" in {
-            result must beGreaterThan(1L)
+            result must beGreaterThan(BigInt(1))
         }
     }
     "Given 522, 575" should {
         val result = s.permutationsStartingWithOne(522, 575)
         "return something" in {
-            result must beGreaterThan(1L)
+            result must beGreaterThan(BigInt(1))
         }
     }
     "Given 772, 81" should {
