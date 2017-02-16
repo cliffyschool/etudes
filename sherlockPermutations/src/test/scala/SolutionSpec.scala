@@ -34,15 +34,33 @@ class SolutionSpec extends Specification {
         }
     }
     "Given a large number of 0's" should {
-        val result = s.permutationsStartingWithOne(400, 4)
+        val result = s.permutationsStartingWithOne(900, 4)
         "return something" in {
             result must beGreaterThan(1L)
         }
     }
     "Given a large number of 1's" should {
-        val result = s.permutationsStartingWithOne(4, 300)
+        val result = s.permutationsStartingWithOne(4, 900)
         "return something" in {
             result must beGreaterThan(1L)
+        }
+    }
+    "Given 522, 575" should {
+        val result = s.permutationsStartingWithOne(522, 575)
+        "return something" in {
+            result must beGreaterThan(1L)
+        }
+    }
+    "Given 772, 81" should {
+        val result = s.permutationsStartingWithOne(772, 81)
+        "return something" in {
+            result must beEqualTo(446215095L)
+        }
+    }
+    "Given 772, 81" should {
+        val result = s.permutationsStartingWithOne(45,6)
+        "return something" in {
+            result must beEqualTo(2118760L)
         }
     }
 }

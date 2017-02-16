@@ -1,6 +1,8 @@
 import java.util.Scanner
 
 class Solution {
+  val modBy = (Math.pow(10, 9) + 7).toLong
+
     def permutationsStartingWithOne(zeroes: Int, ones: Int) = {
       if (ones == 0)
         0L
@@ -10,13 +12,19 @@ class Solution {
         val n = zeroes + ones - 1
         val r = zeroes
         val nMinusR = n - r
-        if (r >= nMinusR)
-          (r + 1.toLong to n.toLong).product/ (1.toLong to nMinusR.toLong).product
-        else {
-          val top = ((nMinusR.toLong + 1) to n).product
-          val bottom = (1.toLong to r.toLong).product
-          top / bottom
-        }
+        /*
+        val top = ((nMinusR.toLong + 1) to n).product
+        val bottom = (1.toLong to r.toLong).product
+        top / bottom
+        */
+        val topNums = (nMinusR + 1 to n)
+        val bottomNums = if (r < topNums.size) Seq(1) else Seq() ++ (1 to r)
+        assert(topNums.size == bottomNums.size)
+        val total =
+          (0 to topNums.size - 1)
+            .map(i => (topNums(i), bottomNums(i)))
+            .foldLeft(1L)((total, topAndBottom) => Math.floorDiv(total * topAndBottom._1, topAndBottom._2).toLong % modBy)
+        total.toLong
       }
     }
   def factorial(n :Int) : Long = {
@@ -39,11 +47,11 @@ object Solution{
       })
     results.foreach(l => println(l))
   }
-  
+
   def readLine(in: Scanner) = {
     in.nextLine()
   }
-  
+
   def readIntFromLine(in: Scanner) = {
     readLine(in).toInt
   }
