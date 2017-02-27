@@ -1,44 +1,76 @@
 import java.util.Scanner
 
+import scala.collection.mutable
+
 class Solution {
 
-    def notificationCount(d: Int, expenditures: Seq[Int]) = {
-      val notificationCount = expenditures.indices
-        .map(notificationsOnDay(expenditures, _, d)).sum
-      notificationCount
-    }
-
-    def notificationsOnDay(expenditures: Seq[Int], index: Int, d: Int) = {
-      if (index < d)
-        0
-      else {
-        val recent = expenditures.slice(index - d, index)
-        val medianExp: Float = medianExpenditures(recent)
-        if (expenditures(index) >= 2 * medianExp)
-          1
+  def notificationCount(d: Int, expenditures: Seq[Int]) = {
+    /*
+    var window = mutable.PriorityQueue[(Int,Int)]()(Ordering.by[(Int,Int), Int](e => e._1).reverse)
+    (0 until d).map(i => (expenditures(i), i)).foreach(window += _)
+    */
+    //var window = (0 until d).map(i => (expenditures(i), i)).sortBy(x => x)
+    val sorted = expenditures.indices.map(x => (expenditures(x), x)).sortBy(_._1)
+    val dayAndSearchIndices = (d until sorted.size)
+      .map(sorted(_)._2)
+      .map(day => {
+        val middle = day / 2
+        val medianIndicesSearchEnd =
+          if (d % 2 == 0) {
+            Seq(middle, middle - 1)
+          } else Seq(middle)
+        (day, medianIndicesSearchEnd)
+      })
+    val dayAndMedians = dayAndSearchIndices.map(dayAndSearchEnd => {
+      val medians =
+        dayAndSearchEnd._2.flatMap(searchEnd => (searchEnd to dayAndSearchEnd._1 - d by -1)
+          .find(idx => {
+            val originalPos = sorted(idx)._2
+            originalPos >= dayAndSearchEnd._1 - d && originalPos < d
+          }))
+      (dayAndSearchEnd._1, medians)
+    })
+    val dayAndMedian = dayAndMedians
+      .map(dayAndMedians =>
+        if(dayAndMedians._2.size == 1)
+        (dayAndMedians._1, dayAndMedians._2.head.toDouble)
         else
-          0
-      }
-    }
+          (dayAndMedians._1, dayAndMedians._2.sum.toDouble / 2))
+  val notificationCount = dayAndMedian
+      .map(dAndM => {
+        val todaysExpenditure = expenditures(dAndM._1)
+        if (todaysExpenditure >= dAndM._2.*(2.0)) 1 else 0
+      }).sum
+
+    notificationCount
+  }
+
+  def notificationsOnDay(recent: Seq[(Int,Int)], todaysExpenditure: Int) = {
+    val medianExp: Float = medianExpenditures(recent)
+    if (todaysExpenditure >= 2 * medianExp)
+      1
+    else
+      0
+  }
 
 
-    def medianExpenditures(slice: Seq[Int]) : Float = {
-      val sorted = slice//.sorted
-      val middle = slice.size / 2
-      if (slice.size % 2 == 0)
-        (sorted(middle) + sorted(middle + 1)) / 2
-      else 
-        sorted(middle)
+  def medianExpenditures(range: Seq[(Int,Int)]): Float = {
+    val middle = range.size / 2
+    if (range.size % 2 == 0) {
+      (range(middle)._1 + range(middle + 1)._1) / 2
     }
+    else
+      range(middle)._1
+  }
 }
 
-object Solution{
+object Solution {
 
-  def main(args: Array[String]) : Unit = {
+  def main(args: Array[String]): Unit = {
     val in = new Scanner(System.in)
     val solution = new Solution()
 
-    val Seq(n,d) = readIntsFromLine(in)
+    val Seq(n, d) = readIntsFromLine(in)
       .take(2).toSeq
     val expenditures = readIntsFromLine(in)
       .take(n).toSeq
@@ -47,11 +79,11 @@ object Solution{
 
     println(count)
   }
-  
+
   def readLine(in: Scanner) = {
     in.nextLine()
   }
-  
+
   def readIntFromLine(in: Scanner) = {
     readLine(in).toInt
   }
@@ -60,3 +92,4 @@ object Solution{
     readLine(in).split(" ").map(s => s.toInt)
   }
 }
+
