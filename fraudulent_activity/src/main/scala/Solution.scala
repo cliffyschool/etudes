@@ -14,20 +14,21 @@ class Solution {
     val dayAndSearchIndices = (d until sorted.size)
       .map(sorted(_)._2)
       .map(day => {
-        val middle = day / 2
+        val middle = day - Math.ceil(d / 2.0).toInt
         val medianIndicesSearchEnd =
-          if (d % 2 == 0) {
+          if (d % 2 == 0 && d > 1) {
             Seq(middle, middle - 1)
           } else Seq(middle)
         (day, medianIndicesSearchEnd)
       })
     val dayAndMedians = dayAndSearchIndices.map(dayAndSearchEnd => {
       val medians =
-        dayAndSearchEnd._2.flatMap(searchEnd => (searchEnd to dayAndSearchEnd._1 - d by -1)
+        dayAndSearchEnd._2.flatMap(searchEnd => (searchEnd to Math.max(dayAndSearchEnd._1 - d, 0) by -1)
           .find(idx => {
             val originalPos = sorted(idx)._2
-            originalPos >= dayAndSearchEnd._1 - d && originalPos < d
+            originalPos >= dayAndSearchEnd._1 - d && originalPos < dayAndSearchEnd._1
           }))
+        .map(x => sorted(x)._1)
       (dayAndSearchEnd._1, medians)
     })
     val dayAndMedian = dayAndMedians
