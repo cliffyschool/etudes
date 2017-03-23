@@ -1,25 +1,44 @@
 import java.util
 import java.util.Scanner
-
+import collection.JavaConverters._
 import scala.collection.{SortedSet, mutable}
 
 class Solution {
-  case class Expenditure(amt: Int, originalPosition: Int)
   trait HasExpenditure {
     def exp : Expenditure
   }
-  case class ExpenditureByAmount(exp: Expenditure) extends Comparable[ExpenditureByAmount] with HasExpenditure {
-    override def compareTo(that: ExpenditureByAmount): Int = {
+  case class Expenditure(amt: Int, originalPosition: Int) extends Comparable[HasExpenditure] with HasExpenditure{
+    override def equals(obj: scala.Any): Boolean = {
+      if (!obj.isInstanceOf[Expenditure])
+        return false
+      val other = obj.asInstanceOf[Expenditure]
+      amt == other.amt && originalPosition == other.originalPosition
+    }
+    override def exp = this
+
+    override def compareTo(o: HasExpenditure): Int = {
+      originalPosition - o.exp.originalPosition
+    }
+  }
+  case class ExpenditureByAmount(exp: Expenditure) extends Comparable[HasExpenditure] with HasExpenditure {
+    override def compareTo(that: HasExpenditure): Int = {
       val round1 = exp.amt - that.exp.amt
       if (round1 == 0)
         exp.originalPosition - that.exp.originalPosition
       else
         round1
     }
+
+    override def equals(obj: scala.Any): Boolean = {
+      exp.equals(obj)
+    }
   }
-  case class ExpenditureByOriginalPos(exp: Expenditure) extends Comparable[ExpenditureByOriginalPos] with HasExpenditure {
-    override def compareTo(that: ExpenditureByOriginalPos): Int = {
+  case class ExpenditureByOriginalPos(exp: Expenditure) extends Comparable[HasExpenditure] with HasExpenditure {
+    override def compareTo(that: HasExpenditure): Int = {
       exp.originalPosition - that.exp.originalPosition
+    }
+    override def equals(obj: scala.Any): Boolean = {
+      exp.equals(obj)
     }
   }
 
@@ -27,9 +46,26 @@ class Solution {
   def notificationCount(d: Int, expenditures: Seq[Int]) = {
     val exps = expenditures.indices.map(i => Expenditure(expenditures(i), i))
     val byAmount = new java.util.TreeSet[ExpenditureByAmount]()
-    exps.foreach(e => byAmount.add(ExpenditureByAmount(e)))
+    exps.take(d).foreach(e => byAmount.add(ExpenditureByAmount(e)))
     val byPos = new java.util.TreeSet[ExpenditureByOriginalPos]()
-    exps.foreach(e => byPos.add(ExpenditureByOriginalPos(e)))
+    exps.take(d).foreach(e => byPos.add(ExpenditureByOriginalPos(e)))
+    val daysToMedians = (d until expenditures.size)
+      .map(day => {
+        val window = byAmount.asScala.toList
+        val middle = window.size / 2
+        val median = if (window.size % 2 == 0) {
+          window.slice(middle - 1, middle).map(_.exp.amt).sum / 2
+        } else
+          window(middle).exp.amt
+        val toRemove = window(0).exp
+        byAmount.remove(toRemove)
+        byPos.remove(toRemove)
+        if (day < exps.size) {
+          byAmount.add(ExpenditureByAmount(exps(day)))
+          byPos.add(ExpenditureByOriginalPos(exps(day)))
+        }
+        (day, median)
+      }).toMap
     1
   }
 
