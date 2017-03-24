@@ -17,7 +17,11 @@ class Solution {
     override def exp = this
 
     override def compareTo(o: HasExpenditure): Int = {
-      originalPosition - o.exp.originalPosition
+      val round1 = exp.amt - o.exp.amt
+      if (round1 == 0)
+        exp.originalPosition - o.exp.originalPosition
+      else
+        round1
     }
   }
   case class ExpenditureByAmount(exp: Expenditure) extends Comparable[HasExpenditure] with HasExpenditure {
@@ -54,7 +58,7 @@ class Solution {
         val window = byAmount.asScala.toList
         val middle = window.size / 2
         val median = if (window.size % 2 == 0) {
-          window.slice(middle - 1, middle).map(_.exp.amt).sum / 2
+          window.slice(middle - 1, middle + 1).map(_.exp.amt).sum / 2
         } else
           window(middle).exp.amt
         val toRemove = window(0).exp
@@ -66,23 +70,18 @@ class Solution {
         }
         (day, median)
       }).toMap
-    1
-  }
-
-    /*
     val notificationCount =
-    (d until expenditures.size)
-      .map(day => {
-        val todaysExpenditure = expenditures(day)
-        val medianExp = daysToMedians(day)
-        if (todaysExpenditure >= 2.0 * medianExp)
-          1
-        else
-          0
-      }).sum
+      (d until expenditures.size)
+        .map(day => {
+          val todaysExpenditure = expenditures(day)
+          val medianExp = daysToMedians(day)
+          if (todaysExpenditure >= 2.0 * medianExp)
+            1
+          else
+            0
+        }).sum
     notificationCount
   }
-  */
 
   def medianElements(range: Seq[(Int,Int)]) = {
     val middleIndex = range.size / 2

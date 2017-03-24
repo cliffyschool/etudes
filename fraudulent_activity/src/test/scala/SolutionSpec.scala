@@ -11,7 +11,14 @@ class SolutionSpec extends FlatSpec with Matchers {
     val count = solution.notificationCount(d, expenditures)
     count should be (2)
   }
-  
+
+  "Notifications" should "work for even-numbered d" in {
+    val d = 4
+    val expenditures = Seq(4,6,8,4,6,12,16,8,10)
+    val count = solution.notificationCount(d, expenditures)
+    count should be (2)
+  }
+
   "Notifications" should "be 0 for a short list" in {
     val d = 5
     val expenditures = Seq(2,3,4,2,3)
