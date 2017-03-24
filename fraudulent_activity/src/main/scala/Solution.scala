@@ -1,4 +1,5 @@
-import java.util.Scanner
+import java.util
+import java.util.{Collections, Scanner}
 
 
 class Solution {
@@ -21,37 +22,45 @@ class Solution {
     }
   }
 
-  def findPos[T](li: scala.collection.IndexedSeq[T], x: T, ordering: Ordering[T])= {
-    scala.collection.Searching.search(li)
-      .search(x, 0, li.size)(ordering)
-      .insertionPoint
+  def findPos[T](li: util.LinkedList[T], x: T, ordering: Ordering[T])= {
+    val index =Collections.binarySearch(li, x, ordering)
+    if (index < 0)
+      -index - 1
+    else index
   }
 
-  def insert[T](li: scala.collection.IndexedSeq[T], x: T)(implicit cmp: Ordering[T]) = {
+  def insert[T](li: util.LinkedList[T], x: T)(implicit cmp: Ordering[T]) = {
     val insertAt = findPos(li, x, cmp)
-    li.patch(insertAt, IndexedSeq(x), 0)
+    li.add(insertAt, x)
   }
 
   def notificationCount(d: Int, expenditures: Seq[Int]) = {
     val exps = expenditures.indices.map(i => Expenditure(expenditures(i), i)).toVector
-    var byAmountList = exps.take(d).sorted(ByAmountOrdering).to[scala.collection.IndexedSeq]
-    var byPositionList = exps.take(d).sorted(ByPositionOrdering).to[scala.collection.IndexedSeq]
+    var byAmountList = new util.LinkedList[Expenditure]()
+    var byPositionList = new util.LinkedList[Expenditure]()
+    exps.take(d)
+      .foreach(e => {
+        byAmountList.add(e)
+        byPositionList.add(e)
+      })
+    byAmountList.sort(ByAmountOrdering)
+    byPositionList.sort(ByPositionOrdering)
     val daysToMedians = (d until expenditures.size)
       .map(day => {
         val window = byAmountList
         val middle = window.size / 2
         val median = if (window.size % 2 == 0) {
-          window.slice(middle - 1, middle + 1).map(_.amt).sum / 2
+          (window.get(middle - 1).amt + window.get(middle).amt) / 2.0
         } else
-          window(middle).amt
-        val toRemove = window.head
-        byAmountList = byAmountList.tail
+          window.get(middle).amt
+        val toRemove = window.get(0)
+        byAmountList.remove(0)
         val posToRemove = findPos(byPositionList, toRemove, ByPositionOrdering)
-        byPositionList = byPositionList.patch(posToRemove, Nil, 1)
+        byPositionList.remove(posToRemove)
         if (day < exps.size) {
           val exp = exps(day)
-          byAmountList = insert(byAmountList, exp)(ByAmountOrdering)
-          byPositionList = insert(byPositionList, exp)(ByPositionOrdering)
+          insert(byAmountList, exp)(ByAmountOrdering)
+          insert(byPositionList, exp)(ByPositionOrdering)
         }
         (day, median)
       }).toMap
@@ -81,7 +90,6 @@ object Solution {
       .take(n).toSeq
 
     val count = solution.notificationCount(d, expenditures)
-
     println(count)
   }
 
