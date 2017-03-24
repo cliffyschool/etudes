@@ -32,7 +32,7 @@ class SolutionSpec extends FlatSpec with Matchers {
     count should be (1)
   }
   "Notifications" should "work for large set" in {
-    val d = 10000
+    val d = 9999
     val expenditures = (0 to 200000)
       .map(i => if (i % 10000 == 0) 3 else 1)
     val count = solution.notificationCount(d, expenditures)
