@@ -37,14 +37,11 @@ class Solution {
   def notificationCount(d: Int, expenditures: Seq[Int]) = {
     val exps = expenditures.indices.map(i => Expenditure(expenditures(i), i)).toVector
     var byAmountList = new util.LinkedList[Expenditure]()
-    var byPositionList = new util.LinkedList[Expenditure]()
     exps.take(d)
       .foreach(e => {
         byAmountList.add(e)
-        byPositionList.add(e)
       })
     byAmountList.sort(ByAmountOrdering)
-    byPositionList.sort(ByPositionOrdering)
     val daysToMedians = (d until expenditures.size)
       .map(day => {
         val window = byAmountList
@@ -55,12 +52,9 @@ class Solution {
           window.get(middle).amt
         val toRemove = window.get(0)
         byAmountList.remove(0)
-        val posToRemove = findPos(byPositionList, toRemove, ByPositionOrdering)
-        byPositionList.remove(posToRemove)
         if (day < exps.size) {
           val exp = exps(day)
           insert(byAmountList, exp)(ByAmountOrdering)
-          insert(byPositionList, exp)(ByPositionOrdering)
         }
         (day, median)
       }).toMap
