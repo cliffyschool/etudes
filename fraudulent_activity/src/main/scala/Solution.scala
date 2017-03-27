@@ -3,61 +3,58 @@ import java.util.{Collections, Scanner}
 
 
 class Solution {
-
-  case class Expenditure(amt: Int, originalPosition: Int)
-
-  object ByAmountOrdering extends Ordering[Expenditure] {
-    override def compare(x: Expenditure, y: Expenditure): Int = {
-      val round1 = x.amt - y.amt
-      if (round1 == 0)
-        x.originalPosition - y.originalPosition
-      else
-        round1
+  def indexByCount(sortedCounts: Array[Int], i: Int, maxIndex: Int) = {
+    var indexOfCount = util.Arrays.binarySearch(sortedCounts, 0, maxIndex, i)
+    if (indexOfCount > 0) {
+      while (indexOfCount - 1 >= 0 && i.equals(sortedCounts(indexOfCount - 1)))
+        indexOfCount = indexOfCount - 1
+    } else {
+      indexOfCount = Math.max(0, -indexOfCount - 1)
     }
+    indexOfCount
   }
 
-  object ByPositionOrdering extends Ordering[Expenditure] {
-    override def compare(x: Expenditure, y: Expenditure): Int = {
-      x.originalPosition - y.originalPosition
-    }
-  }
-
-  def findPos[T](li: util.LinkedList[T], x: T, ordering: Ordering[T])= {
-    val index =Collections.binarySearch(li, x, ordering)
-    if (index < 0)
-      -index - 1
-    else index
-  }
-
-  def insert[T](li: util.LinkedList[T], x: T)(implicit cmp: Ordering[T]) = {
-    val insertAt = findPos(li, x, cmp)
-    li.add(insertAt, x)
-  }
+  case class DayAndRange(day: Int, start: Int, end: Int)
 
   def notificationCount(d: Int, expenditures: Seq[Int]) = {
-    val exps = expenditures.indices.map(i => Expenditure(expenditures(i), i)).toVector
-    var byAmountList = new util.LinkedList[Expenditure]()
-    exps.take(d)
-      .foreach(e => {
-        byAmountList.add(e)
+    val exps = expenditures.toVector
+    var counts = new java.util.ArrayList[Int](Collections.nCopies(201, 0))
+    (0 until d)
+      .map(exps(_))
+      .foreach(exp => {
+        val c = counts.get(exp)
+        counts.set(exp, c + 1)
       })
-    byAmountList.sort(ByAmountOrdering)
-    val daysToMedians = (d until expenditures.size)
-      .map(day => {
-        val window = byAmountList
-        val middle = window.size / 2
-        val median = if (window.size % 2 == 0) {
-          (window.get(middle - 1).amt + window.get(middle).amt) / 2.0
-        } else
-          window.get(middle).amt
-        val toRemove = window.get(0)
-        byAmountList.remove(0)
-        if (day < exps.size) {
-          val exp = exps(day)
-          insert(byAmountList, exp)(ByAmountOrdering)
+    val sortedCounts = Array.fill(201)(0)
+    var total = 0
+    sortedCounts.indices
+      .foreach(i => {
+        val c = counts.get(i)
+        val sortedCount = c + total
+        sortedCounts(i) = sortedCount
+        total = sortedCount
+      })
+    val middle = d / 2 + 1
+    val medianPositions = if (d % 2 == 0) Seq(middle - 1, middle) else Seq(middle)
+
+    var daysToMedians = Map[Int, Double]()
+    (d until exps.size)
+      .map(day => DayAndRange(day, day - d, day - 1))
+      .foreach(dayAndRange => {
+        val firstAmnt = exps(dayAndRange.start)
+        val lastAmnt = exps(dayAndRange.end)
+        if (dayAndRange.start > 0) {
+          // add lastAmt to sortedCounts
+          (lastAmnt until sortedCounts.length)
+            .foreach(i => sortedCounts(i) = sortedCounts(i) + 1)
         }
-        (day, median)
-      }).toMap
+        val medianValues = medianPositions.map(pos => indexByCount(sortedCounts, pos, sortedCounts.length - 1))
+        val median = if (medianValues.size == 1) medianValues.head else medianValues.sum / 2.0
+        daysToMedians = daysToMedians + (dayAndRange.day -> median)
+        (firstAmnt until sortedCounts.length)
+          .foreach(i => sortedCounts(i) = sortedCounts(i) - 1)
+      })
+
     val notificationCount =
       (d until expenditures.size)
         .map(day => {
