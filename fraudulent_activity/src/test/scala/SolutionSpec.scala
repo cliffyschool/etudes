@@ -1,3 +1,5 @@
+import java.util
+
 import collection.mutable.Stack
 import org.scalatest._
 
@@ -37,5 +39,22 @@ class SolutionSpec extends FlatSpec with Matchers {
       .map(i => if (i % 10000 == 0) 3 else 1)
     val count = solution.notificationCount(d, expenditures)
     count should be (20)
+  }
+
+  "find by count" should "find by index with multiple occurences" in {
+    val sortedCounts = util.Arrays.asList(0, 2, 2, 3)
+    val index = solution.indexByCount(sortedCounts, 1)
+    index should be (1)
+  }
+  "find by count" should "return first index on multiple count matches" in {
+    val sortedCounts = util.Arrays.asList(0, 2, 2, 3)
+    val index = solution.indexByCount(sortedCounts, 2)
+    index should be (1)
+  }
+  "Notifications" should "work for paper example" in {
+    val d = 3
+    val expenditures = Seq(1,4,1,2,7,5,2)
+    val count = solution.notificationCount(d, expenditures)
+    count should be (-1)
   }
 }
